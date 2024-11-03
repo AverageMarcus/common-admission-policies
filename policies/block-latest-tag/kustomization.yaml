@@ -1,0 +1,10 @@
+commonLabels:
+  app.kubernetes.io/name: block-latest-tag
+  app.kubernetes.io/part-of: common-validating-policies
+
+commonAnnotations:
+  kubernetes.io/description: This policy prevents the use of any container image using the "latest" tag.
+
+resources:
+  - policy.yaml
+  - policy-binding.yaml

@@ -1,0 +1,49 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: block-latest-tag
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:   ["apps"]
+      apiVersions: ["v1"]
+      operations:  ["CREATE", "UPDATE"]
+      resources:   ["deployments", "daemonsets", "statefulsets"]
+    - apiGroups:   [""]
+      apiVersions: ["v1"]
+      operations:  ["CREATE", "UPDATE"]
+      resources:   ["pods"]
+  validations:
+    - message: The use of the 'latest' tag is not allowed
+      reason: Forbidden
+      expression: |
+        // Pods
+        (
+            !has(object.spec.template) && (
+                  object.spec.containers.all(container,
+                    !container.image.endsWith(":latest") && container.image.contains(":")
+                  ) &&
+                  (
+                    !has(object.spec.initContainers) ||
+                    object.spec.template.spec.initContainers.all(container,
+                      !container.image.endsWith(":latest") && container.image.contains(":")
+                    )
+                  )
+                )
+        )
+        ||
+        // Deployments, etc.
+        (
+            has(object.spec.template) && (
+                  object.spec.template.spec.containers.all(container,
+                    !container.image.endsWith(":latest") && container.image.contains(":")
+                  ) &&
+                  (
+                    !has(object.spec.template.spec.initContainers) ||
+                    object.spec.template.spec.initContainers.all(container,
+                      !container.image.endsWith(":latest") && container.image.contains(":")
+                    )
+                  )
+                )
+        )
