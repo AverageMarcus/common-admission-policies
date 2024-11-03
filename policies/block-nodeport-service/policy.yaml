@@ -1,0 +1,17 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: block-nodeport-service
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:   [""]
+      apiVersions: ["v1"]
+      operations:  ["CREATE", "UPDATE"]
+      resources:   ["services"]
+  validations:
+    - message: NodePort type Services are not allowed
+      reason: Forbidden
+      expression: |
+        object.spec.type != "NodePort"
