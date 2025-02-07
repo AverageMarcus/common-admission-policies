@@ -1,6 +1,11 @@
-commonLabels:
-  app.kubernetes.io/name: block-nodeport-service
-  app.kubernetes.io/part-of: common-admission-policies
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+labels:
+- includeSelectors: true
+  pairs:
+    app.kubernetes.io/name: block-nodeport-service
+    app.kubernetes.io/part-of: common-admission-policies
 
 commonAnnotations:
   kubernetes.io/description: This policy prevents the use of NodePort type services to avoid bypassing NetworkPolicy enforcement.
