@@ -1,0 +1,9 @@
+apiVersion: admissionregistration.k8s.io/v1alpha1
+kind: MutatingAdmissionPolicyBinding
+metadata:
+  name: "proxy-values"
+spec:
+  policyName: "proxy-values"
+  matchResources: {}
+  paramRef:
+    name: proxy-values

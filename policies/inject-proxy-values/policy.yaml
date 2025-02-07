@@ -1,0 +1,63 @@
+apiVersion: admissionregistration.k8s.io/v1alpha1
+kind: MutatingAdmissionPolicy
+metadata:
+  name: "proxy-values"
+spec:
+  failurePolicy: Fail
+  reinvocationPolicy: IfNeeded
+  matchConstraints:
+    resourceRules:
+      - apiGroups:   [""]
+        apiVersions: ["v1"]
+        operations:  ["CREATE"]
+        resources:   ["pods"]
+  matchConditions: []
+  paramKind:
+    apiVersion: v1
+    kind: ConfigMap
+  mutations:
+  - patchType: "ApplyConfiguration"
+    applyConfiguration:
+      expression: >
+        Object{
+          spec: Object.spec{
+              containers: object.spec.containers.map(c,
+                  Object.spec.containers{
+                      name: c.name,
+                      env: [
+                        Object.spec.containers.env{
+                          name: "HTTP_PROXY",
+                          value: params.data.httpProxy
+                        },
+                        Object.spec.containers.env{
+                          name: "HTTPS_PROXY",
+                          value: params.data.httpsProxy
+                        },
+                        Object.spec.containers.env{
+                          name: "NO_PROXY",
+                          value: params.data.noProxy
+                        }
+                      ]
+                  }
+              ),
+              initContainers: has(object.spec.initContainers) ? object.spec.initContainers.map(c,
+                  Object.spec.initContainers{
+                      name: c.name,
+                      env: [
+                        Object.spec.initContainers.env{
+                          name: "HTTP_PROXY",
+                          value: params.data.httpProxy
+                        },
+                        Object.spec.initContainers.env{
+                          name: "HTTPS_PROXY",
+                          value: params.data.httpsProxy
+                        },
+                        Object.spec.initContainers.env{
+                          name: "NO_PROXY",
+                          value: params.data.noProxy
+                        }
+                      ]
+                  }
+              ) : []
+          }
+        }

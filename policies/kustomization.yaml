@@ -1,3 +1,4 @@
 resources:
   - ./block-latest-tag/
   - ./block-nodeport-service/
+  - ./inject-proxy-values/
