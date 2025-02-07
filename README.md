@@ -1,6 +1,6 @@
-# common-validating-policies
+# common-admission-policies
 
-A collection of common ValidatingAdmissionPolicies to help enforce best practices within Kubernetes clusters
+A collection of common ValidatingAdmissionPolicies & MutatingAdmissionPolicies to help enforce best practices within Kubernetes clusters
 
 ## Installation
 
